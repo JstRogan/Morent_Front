@@ -1,0 +1,12 @@
+[build]
+  # Build command for Vite
+  command = "npm run build"
+  
+  # The directory where Vite outputs the built files
+  publish = "dist"
+
+# SPA redirect rule - ensures React Router works properly
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
