@@ -57,10 +57,27 @@ export const AllCarsPage: React.FC = () => {
   });
 
   const mapBackendCarToSearched = (car: BackendCar): SearchedCar => {
-    const primaryImage = car.images?.find((img) => img.isPrimary) || car.images?.[0];
+    const anyCar: any = car;
+    const images =
+      (Array.isArray(anyCar.imageUrls) && anyCar.imageUrls.length > 0
+        ? anyCar.imageUrls
+        : Array.isArray(anyCar.images)
+        ? anyCar.images
+        : []) as {
+        id: string;
+        url: string;
+        isPrimary: boolean;
+        sortOrder: number;
+      }[];
+
+    const primaryImage = images.find((img) => img.isPrimary) || images[0];
     return {
       id: car.id,
-      imageCar: primaryImage?.url || car.imageUrl,
+      imageCar:
+        (primaryImage && primaryImage.url) ||
+        anyCar.primaryImageUrl ||
+        anyCar.imageUrl ||
+        '',
       name: car.name || `${car.brand} ${car.model}`,
       ownerUsername: '',
       location: car.location,

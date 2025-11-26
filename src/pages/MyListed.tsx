@@ -72,8 +72,20 @@ export const MyListedPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-4">
         {items.map((item) => {
-          const primaryImage = item.images?.find((img) => img.isPrimary) || item.images?.[0];
-          const image = primaryImage?.url || item.imageUrl;
+          const anyItem: any = item;
+          const images =
+            (Array.isArray(anyItem.imageUrls) && anyItem.imageUrls.length > 0
+              ? anyItem.imageUrls
+              : Array.isArray(anyItem.images)
+              ? anyItem.images
+              : []) as { id: string; url: string; isPrimary: boolean; sortOrder: number }[];
+
+          const primaryImage = images.find((img) => img.isPrimary) || images[0];
+          const image =
+            (primaryImage && primaryImage.url) ||
+            anyItem.primaryImageUrl ||
+            anyItem.imageUrl ||
+            '';
           const title = item.name || `${item.brand} ${item.model}`;
 
           return (

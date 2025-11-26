@@ -105,19 +105,28 @@ export const SearchPage: React.FC = () => {
         });
         const list = Array.isArray(data) ? data : [];
         setCars(
-          list.map((item) => ({
-            id: item.id,
-            imageCar: item.imageCar,
-            name: item.name,
-            ownerUsername: item.ownerUsername || '',
-            location: item.location,
-            fuelType: 'Gas',
-            transmission: 'Automatic',
-            seats: 4,
-            pricePerDay: item.price,
-            hostImage: '',
-            hostName: item.ownerUsername || '',
-          }))
+          list.map((item) => {
+            const anyItem: any = item;
+            const imageCar =
+              item.imageCar ||
+              anyItem.primaryImageUrl ||
+              anyItem.imageUrl ||
+              '';
+
+            return {
+              id: item.id,
+              imageCar,
+              name: item.name,
+              ownerUsername: item.ownerUsername || '',
+              location: item.location,
+              fuelType: 'Gas',
+              transmission: 'Automatic',
+              seats: 4,
+              pricePerDay: item.price,
+              hostImage: '',
+              hostName: item.ownerUsername || '',
+            };
+          })
         );
       } catch (err) {
         console.error(err);
@@ -132,10 +141,24 @@ export const SearchPage: React.FC = () => {
   }, [location]);
 
   function mapBackendCarToSearched(car: BackendCar): SearchedCar {
-		const primaryImage = car.images?.find((img) => img.isPrimary) || car.images?.[0];
+		const anyCar: any = car;
+		const images =
+			(Array.isArray(anyCar.imageUrls) && anyCar.imageUrls.length > 0
+				? anyCar.imageUrls
+				: Array.isArray(anyCar.images)
+				? anyCar.images
+				: []) as { id: string; url: string; isPrimary: boolean; sortOrder: number }[];
+
+		const primaryImage =
+			images.find((img) => img.isPrimary) || images[0];
+
 		return {
 			id: car.id,
-			imageCar: primaryImage?.url || car.imageUrl,
+			imageCar:
+				(primaryImage && primaryImage.url) ||
+				anyCar.primaryImageUrl ||
+				anyCar.imageUrl ||
+				'',
 			name: car.name || `${car.brand} ${car.model}`,
 			ownerUsername: '',
 			location: car.location,

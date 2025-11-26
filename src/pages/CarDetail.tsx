@@ -119,8 +119,40 @@ export const CarDetailsPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const { data } = await api.get<CarDetailsResponse>(`/Car/${id}`);
-        setCar(data);
+        const { data } = await api.get(`/Car/${id}`);
+
+        const raw: any = data || {};
+
+        const images: CarImage[] =
+          (Array.isArray(raw.imageUrls) && raw.imageUrls.length > 0
+            ? raw.imageUrls
+            : Array.isArray(raw.images)
+            ? raw.images
+            : []) as CarImage[];
+
+        const primaryFromImages =
+          images.find((img) => img.isPrimary) || images[0];
+
+        const normalized: CarDetailsResponse = {
+          id: raw.id,
+          name: raw.name,
+          brand: raw.brand,
+          model: raw.model,
+          year: raw.year,
+          price: raw.price,
+          description: raw.description,
+          location: raw.location,
+          isAvailable: raw.isAvailable,
+          imageUrl:
+            (primaryFromImages && primaryFromImages.url) ||
+            raw.primaryImageUrl ||
+            raw.imageUrl ||
+            '',
+          ownerUserId: raw.ownerUserId,
+          images,
+        };
+
+        setCar(normalized);
       } catch (e) {
         console.error('Failed to load car details', e);
         setError('Failed to load car details');
@@ -352,8 +384,14 @@ export const CarDetailsPage: React.FC = () => {
 
   if (!car) return null;
 
-  const primaryImage = car.images?.find((img) => img.isPrimary) || { url: car.imageUrl };
-  const allImages = car.images && car.images.length > 0 ? car.images : [{ id: 'main', url: car.imageUrl, isPrimary: true, sortOrder: 0 }];
+  const allImages = car.images && car.images.length > 0
+    ? car.images
+    : car.imageUrl
+    ? [{ id: 'main', url: car.imageUrl, isPrimary: true, sortOrder: 0 }]
+    : [];
+
+  const primaryImage =
+    allImages.find((img) => img.isPrimary) || allImages[0] || { url: car.imageUrl };
   const otherImages = allImages.filter(img => img.url !== primaryImage.url).slice(0, 2);
   const totalImagesCount = allImages.length;
 

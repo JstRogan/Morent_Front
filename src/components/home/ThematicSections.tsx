@@ -74,7 +74,20 @@ export const ThematicSections: React.FC = () => {
 
           const backendCars = Array.isArray(res.data) ? res.data : [];
           next[cfg.key] = backendCars.map<LocationCarResponse>((c) => c).map<Car>((c) => {
-            const primaryImage = c.images?.find((img) => img.isPrimary) || c.images?.[0];
+            const anyCar: any = c;
+            const images =
+              (Array.isArray(anyCar.imageUrls) && anyCar.imageUrls.length > 0
+                ? anyCar.imageUrls
+                : Array.isArray(anyCar.images)
+                ? anyCar.images
+                : []) as {
+                id: string;
+                url: string;
+                isPrimary: boolean;
+                sortOrder: number;
+              }[];
+
+            const primaryImage = images.find((img) => img.isPrimary) || images[0];
             return {
               id: c.id,
               make: c.brand,
@@ -86,7 +99,11 @@ export const ThematicSections: React.FC = () => {
               trips: 0,
               hostName: '',
               hostImage: '',
-              image: primaryImage?.url || c.imageUrl,
+              image:
+                (primaryImage && primaryImage.url) ||
+                anyCar.primaryImageUrl ||
+                anyCar.imageUrl ||
+                '',
               location: c.location,
               city: c.location,
               district: '',

@@ -104,7 +104,8 @@ export const EditCarPage: React.FC = () => {
       setError(null);
       setSuccess(null);
 
-      let primaryImageUrl = car.imageUrl;
+      const anyCar: any = car;
+      let primaryImageUrl = anyCar.primaryImageUrl || car.imageUrl;
       if (primaryFile) {
         const uploaded = await uploadPrimaryImage();
         if (uploaded) primaryImageUrl = uploaded;
