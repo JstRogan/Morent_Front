@@ -42,6 +42,9 @@ export const UserProfilePage: React.FC = () => {
         setLoading(true);
         setError(null);
         const { data } = await api.get<PublicProfile>(`/Account/profile/${userId}`);
+        if (data.roles?.includes('UserVerified')) {
+          data.isVerified = true;
+        }
         setProfile(data);
       } catch (err) {
         console.error('Failed to load public profile', err);

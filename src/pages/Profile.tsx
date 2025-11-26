@@ -49,6 +49,9 @@ export const ProfilePage: React.FC = () => {
     const fetchProfile = async () => {
       try {
         const { data } = await api.get<Profile>('/Account/profile');
+        if (data.roles?.includes('UserVerified')) {
+          data.isVerified = true;
+        }
         setProfile(data);
         setNewUsername(data.username || '');
 

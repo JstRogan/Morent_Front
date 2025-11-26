@@ -12,6 +12,7 @@ interface NavbarUserProfile {
   email: string;
   imageProfileURL?: string;
   isVerified?: boolean;
+  roles?: string[];
 }
 
 interface OwnerBookingRequest {
@@ -67,7 +68,8 @@ export const Navbar: React.FC = () => {
           username: profile.username,
           email: profile.email,
           imageProfileURL: profile.imageProfileURL,
-          isVerified: (profile.userVerified ?? profile.isVerified) as boolean | undefined,
+          isVerified: (profile.userVerified ?? profile.isVerified) || profile.roles?.includes('UserVerified'),
+          roles: profile.roles,
         });
       } catch (error) {
         console.error('Failed to load navbar profile', error);
@@ -88,7 +90,8 @@ export const Navbar: React.FC = () => {
           username: profile.username,
           email: profile.email,
           imageProfileURL: profile.imageProfileURL,
-          isVerified: (profile.userVerified ?? profile.isVerified) as boolean | undefined,
+          isVerified: (profile.userVerified ?? profile.isVerified) || profile.roles?.includes('UserVerified'),
+          roles: profile.roles,
         });
       } catch (error) {
         console.error('Failed to reload navbar profile after update', error);
